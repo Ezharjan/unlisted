@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta name="viewport"
+    content="width=device-width,height=device-height,inital-scale=1.0,maximum-scale=1.0,user-scalable=no;">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="format-detection" content="telephone=no">
+  <link rel="icon" href="data:;base64,=">
+  <title>用户登录</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    .error {
+      color: red;
+      display: none;
+    }
+
+    .panel {
+      text-align: center;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background-color: #f5f5f5;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="panel" id="loginPanel">
+    <h2>用户登录</h2>
+    <div>
+      <label for="username">账户:</label>
+      <input type="text" id="username" required>
+    </div>
+    <div>
+      <label for="password">密码:</label>
+      <input type="password" id="password" required>
+    </div>
+    <p></p>
+    <div class="error" id="error">用户名或密码错误</div>
+    <button onclick="login()">登录</button>
+  </div>
+
+  <div class="panel hidden" id="errorPanel">
+    <h2>404 - 页面不存在</h2>
+    <!-- <p>输入错误次数过多，请稍后重试！</p> -->
+  </div>
+</body>
+<script>
+  function login() {
+    var username = document.getElementById("username").value;
+    var password = document.getElementById("password").value;
+    var attemptCount = localStorage.getItem("attemptCount") || 0;
+    if (attemptCount >= 3) {
+      // 错误次数过多，显示404页面
+      displayElement("loginPanel", "none");
+      displayElement("errorPanel", "block");
+    } else {
+      if (username === "alexander" && password === "123456") {
+        // 登录成功，跳转到目标页面
+        window.location.href = "./clock.html"; // 指向一个本站导航页
+        localStorage.setItem("is_authorized", true); // 用于给别的网页检测是否登录授权过
+      } else {
+        // 显示用户名密码错误提示
+        displayElement("error", "block");
+        // 登录失败，显示错误信息
+        attemptCount++;
+        localStorage.setItem("attemptCount", attemptCount);
+      }
+    }
+  }
+
+  function displayElement(elementId, displayValue) {
+    ele = document.getElementById(elementId) || null;
+    ele && (ele.style.display = displayValue);
+  }
+
+  function showHomePageDynamically() {
+    // 用户初次登录时，重置尝试次数为0 -- For debugging purposes mainly 
+    if (!localStorage.getItem("attemptCount")) {
+      localStorage.setItem("attemptCount", 0);
+    }
+    var attemptCount = localStorage.getItem("attemptCount") || 0;
+    if (attemptCount >= 3) {
+      // 错误次数过多，显示404页面
+      displayElement("loginPanel", "none");
+      displayElement("errorPanel", "block");
+    } else {
+      document.addEventListener("DOMContentLoaded", function () {
+        var passwordInput = document.getElementById("password");
+        passwordInput.addEventListener("keyup", function (event) {
+          if (event.keyCode === 13) {
+            event.preventDefault();
+            login();
+          }
+        });
+      });
+    }
+  }
+
+  showHomePageDynamically();
+</script>
+
+</html>
